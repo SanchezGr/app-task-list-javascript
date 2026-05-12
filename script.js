@@ -32,6 +32,12 @@ function createTaskListElement(taskText, isCompleted) {
 
     attachTaskListEvents(label);
     taskList.appendChild(label);
+    // Запобігаємо спрацюванню події для label 
+// при кліку на тексті завданні
+textSpan.addEventListener('click', (e) => {
+    e.preventDefault();
+});
+
 }
 
 function attachTaskListEvents(label) {
@@ -52,6 +58,12 @@ function attachTaskListEvents(label) {
             e.preventDefault();
             textSpan.blur();
         }
+        // Запобігаємо спрацюванню події для label 
+// при кліку на тексті завданні
+textSpan.addEventListener('click', (e) => {
+    e.preventDefault();
+});
+
     });
 
     textSpan.addEventListener('click', (e) => {
