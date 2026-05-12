@@ -2,6 +2,8 @@ const taskInput = document.getElementById('task-input');
 const taskAddBtn = document.getElementById('task-add-btn');
 const taskList = document.getElementById('task-list');
 
+document.addEventListener('DOMContentLoaded', loadTaskList);
+
 function addTask() {
     const taskText = taskInput.value.trim();
 
@@ -10,155 +12,98 @@ function addTask() {
         return;
     }
 
-    const label = document.createElement('label');
-    label.className = 'task-list-item';
-
-    label.innerHTML = `
-        <input type="checkbox">
-        <span class="task-checkmark"></span>
-        <span class="task-text">${taskText}</span>
-        <button class="task-delete-btn" title="Видалити завдання">✖</button>
-    `;
-
-    attachTaskEvents(label);
-
-    taskList.appendChild(label);
+    createTaskListElement(taskText, false);
+    saveTaskList();
 
     taskInput.value = "";
     taskInput.focus();
 }
 
-function attachTaskEvents(label) {
+function createTaskListElement(taskText, isCompleted) {
+    const label = document.createElement('label');
+    label.className = 'task-list-item';
+
+    label.innerHTML = `
+        <input type="checkbox" ${isCompleted ? 'checked' : ''}>
+        <span class="task-checkmark"></span>
+        <span class="task-text" contenteditable="true" spellcheck="false">${taskText}</span>
+        <button class="task-delete-btn" title="Видалити завдання">✖</button>
+    `;
+
+    attachTaskListEvents(label);
+    taskList.appendChild(label);
+}
+
+function attachTaskListEvents(label) {
+    const textSpan = label.querySelector('.task-text');
+    const checkbox = label.querySelector('input');
     const taskDeleteBtn = label.querySelector('.task-delete-btn');
+
+    textSpan.addEventListener('blur', () => {
+        if (textSpan.innerText.trim() === "") {
+            textSpan.innerText = "Введіть нове завдання";
+        }
+
+        saveTaskList();
+    });
+
+    textSpan.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            textSpan.blur();
+        }
+    });
+
+    textSpan.addEventListener('click', (e) => {
+        e.preventDefault();
+    });
+
+    checkbox.addEventListener('change', () => {
+        saveTaskList();
+    });
 
     taskDeleteBtn.addEventListener('click', (e) => {
         e.preventDefault();
         label.remove();
+        saveTaskList();
     });
 }
 
-document.querySelectorAll('#task-list label').forEach(attachTaskEvents);
-
-taskAddBtn.addEventListener('click', addTask);
-
-taskInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        addTask();
-    }
-});
-// Отримуємо посилання на елементи DOM
-const taskInput = document.getElementById('task-input');
-const taskAddBtn = document.getElementById('task-add-btn');
-const taskList = document.getElementById('task-list');
-
-
-// Відтворюємо список завдань з LocalStorage
-document.addEventListener('DOMContentLoaded', loadTaskList);
- 
-// Функція для додавання до списку завдань нового завдання
-// з урахуванням збереження списку завдань у LocalStorage
-function addTask() {
-    const taskText = taskInput.value.trim();
-    if (taskText === "") return;
- 
-    createTaskListElement(taskText, false);
-    saveTaskList(); // Зберігаємо після додавання
- 
-    taskInput.value = "";
-    taskInput.focus();
-}
- 
-// Функція як для створення нових завдань 
-// з добавленням кнопки видалення, так і для
-// відтворення збереженого списку завдань з LocalStorage
-function createTaskListElement(taskText, isCompleted) {
-    // Створюємо елемент завдання (контейнер label)
-    const label = document.createElement('label');
-    label.className = 'task-list-item';
- 
-    // Наповнюємо його структурними елементами
-    label.innerHTML = `
-        <input type="checkbox" ${isCompleted ? 'checked' : ''}>
-        <span class="task-checkmark"></span>
-        <span class="task-text">${taskText}</span>
-        <button class="task-delete-btn" title="Видалити завдання">✖</button>
-    `;
- 
-    // Додаємо подію для checkbox зміни стану виконання завдання
-    const checkbox = label.querySelector('input');
-    checkbox.addEventListener('change', () => {
-        saveTaskList(); // Зберігаємо після кліку
-    });
- 
-    // Додаємо подію для кнопки видалення завдання
-    const taskDeleteBtn = label.querySelector('.task-delete-btn');
-    taskDeleteBtn.addEventListener('click', () => {
-        label.remove(); // Видаляємо завдання
-        saveTaskList(); // Зберігаємо після видалення
-    });
- 
-    taskList.appendChild(label);
-}
- 
-//Функція для збереження всіх завдань у LocalStorage
 function saveTaskList() {
     const myTaskList = [];
+
     document.querySelectorAll('.task-list-item').forEach(item => {
         myTaskList.push({
-            text: item.querySelector('.task-text').innerText,
+            text: item.querySelector('.task-text').innerText.trim(),
             completed: item.querySelector('input').checked
         });
     });
-    // Перетворюємо масив об'єктів у рядок JSON
+
     localStorage.setItem('myTaskList', JSON.stringify(myTaskList));
 }
- 
-// Функція для завантаження списку завдань з LocalStorage
+
 function loadTaskList() {
-    // Видаляємо зі списку завдань всі статичні завдання
-    staticTaskList = document.querySelectorAll('.task-list-item');
+    const staticTaskList = document.querySelectorAll('.task-list-item');
+
     staticTaskList.forEach(item => {
         item.remove();
     });
- 
-    // Додаємо у список завдань всі завдання з LocalStorage
+
     const savedTaskList = localStorage.getItem('myTaskList');
+
     if (savedTaskList) {
         const myTaskList = JSON.parse(savedTaskList);
-        myTaskList.forEach(myTaskList => {
-            createTaskListElement(myTaskList.text, myTaskList.completed);
+
+        myTaskList.forEach(task => {
+            createTaskListElement(task.text, task.completed);
         });
     }
 }
- 
-// Додаємо слухач кліку для кнопки додавання нових завдань
+
 taskAddBtn.addEventListener('click', addTask);
- 
-// Дозволяємо додавати завдання натисканням клавіші Enter
+
 taskInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
         addTask();
     }
 });
-
-
-// Функція для обробки подій на елементах списку
-function attachTaskListEvents(label) {
-    // Додаємо подію для кнопки видалення
-    const taskDeleteBtn = label.querySelector('.task-delete-btn');
-    taskDeleteBtn.addEventListener('click', () => {
-        label.remove();
-        saveTaskList();
-    });
-
-
-    // Додаємо подію для checkbox зміни стану виконання завдання
-    const checkbox = label.querySelector('input');
-    checkbox.addEventListener('change', () => {
-        saveTaskList();
-    });
-}
- 
-// Навішуємо функцію обробки подій на статичні елементи списку
-document.querySelectorAll('#task-list label').forEach(attachTaskListEvents);
- 
