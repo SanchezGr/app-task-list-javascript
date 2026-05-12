@@ -31,9 +31,9 @@
 
 
 1.  **Клонувати репозиторій app-task-list-javascript.git:**
-    ```bash
-https://github.com/SanchezGr/app-task-list-javascript.git
-```
+     ```bash
+    https://github.com/SanchezGr/app-task-list-javascript.git
+     ```
 
 
 2.  **Перейти у папку app-task-list-javascript:**
