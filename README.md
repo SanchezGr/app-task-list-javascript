@@ -10,7 +10,7 @@
 Переглянути вебзастосування можна за посиланням:
 
 
-👉 **https://yuriiklimyuk.github.io/app-task-list-javascript/**
+👉 **https://sanchezgr.github.io/app-task-list-javascript/**
 
 
 ## 🚀 Технології
@@ -32,8 +32,8 @@
 
 1.  **Клонувати репозиторій app-task-list-javascript.git:**
     ```bash
-    git clone https://github.com/YuriiKlimyuk/app-task-list-javascript.git
-    ```
+https://github.com/SanchezGr/app-task-list-javascript.git
+```
 
 
 2.  **Перейти у папку app-task-list-javascript:**
